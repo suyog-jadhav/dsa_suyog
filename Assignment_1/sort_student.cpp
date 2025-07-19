@@ -107,13 +107,13 @@ int main(int argc,char* argv[]){
 	student s[200];
 	load_data(argv[1],s,&size);
 
-    sort_data(s,size);
-    store(s,size,argv[2]);
+    	sort_data(s,size);
+    	store(s,size,argv[2]);
 
-    shell_sort_by_name(s,size);
-    store(s,size,argv[3]);
+    	shell_sort_by_name(s,size);
+    	store(s,size,argv[3]);
 
-    radix_sort_toppers(s,size,argv[4]);
+    	radix_sort_toppers(s,size,argv[4]);
 
 	return 0;
 }
