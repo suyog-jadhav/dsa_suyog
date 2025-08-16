@@ -1,0 +1,493 @@
+#include<iostream>
+#include<string>
+
+
+using namespace std;
+
+
+struct task{
+    int task_id;
+    string task_name;
+    int priority;
+    int time2complete;
+    task *next;
+};
+
+
+class task_manager{
+    task *head,*tail;
+    public:
+        task_manager(){
+            head = NULL;
+            tail = NULL;
+        }
+       
+        void add(int task_id,string task_name,int priority,int time2complete){
+            task *p = new task;
+            if(!p) return;
+            p->task_id = task_id;
+            p->task_name = task_name;
+            p->priority = priority;
+            p->time2complete = time2complete;
+            p->next = NULL;
+           
+            if(!head){
+                head = p;
+                tail = p;
+                cout<<"task added!!"<<endl;
+                return;
+            }
+           	if(p->priority > head->priority){
+            	p->next = head;
+            	head = p;
+            	cout<<"task added!!"<<endl;
+            	return;
+            }
+            if(p->priority == 1){
+            	tail->next = p;
+            	tail = p;
+            	cout<<"task added!!"<<endl;
+            	return;
+            }
+            task *temp = head;
+            while(temp->next && temp->next->priority>=p->priority)
+                temp = temp->next;
+            p->next = temp->next;
+            temp->next = p;
+            if(!p->next)
+            	tail = p;
+            cout<<"task added!!"<<endl;
+            
+            return;
+        }
+       
+        void display(){
+            cout<<endl;
+            if(!head){
+                cout<<"task list is empty"<<endl;
+                return;
+            }
+            task *temp = head;
+            while(temp){
+                cout<<temp->task_id<<"\t"<<temp->task_name<<"\t"<<temp->priority<<"\t"<<temp->time2complete<<endl;
+                temp = temp->next;
+            }
+            return;
+        }
+       
+        void delete_task(int task_id){
+            //list empty
+            if(!head){
+                cout<<"list is empty"<<endl;
+                return;
+            }
+            task *p = head,*q=NULL;
+            
+            
+            while(p!=NULL && p->task_id != task_id){
+                q = p;
+                p = p->next;
+            }
+            //element not found
+            if(!p){
+            	cout<<"task id not found!!"<<endl;
+            	return;
+            }	
+            //only one element
+            if(head == tail){
+            	head = NULL;
+            	tail = NULL;
+            	delete p;
+            	cout<<"task deleted!!"<<endl;
+            	return;
+            }
+            //element is at tail
+            if(!p->next){
+            	tail = q;
+                q->next = NULL;
+                delete p;
+                cout<<"task deleted!!"<<endl;
+                return;
+            }
+            //element is at head
+            if(!q){
+            	head = head->next;
+            	delete p;
+            	cout<<"task deleted!!"<<endl;
+            	return;
+            }
+            
+            //other elements
+            q->next = p->next;
+            delete p;
+            cout<<"task deleted!!"<<endl;
+            return;
+           
+        }
+        void update_task(int task_id,string task_name,int priority,int time2complete){
+            task *p = head;
+            /*if(task_id == p->task_id){
+                p->task_name = task_name;
+                p->priority = priority;
+                p->time2complete = time2complete;
+                cout<<"\ntask updated\n";
+                return;
+            }*/
+            if(!head){
+            	cout<<"list is empty"<<endl;
+            	return;
+            }
+            while(p && p->task_id != task_id ){
+                p = p->next;
+            }
+            if(!p){
+                cout<<"id not found"<<endl;
+                return;
+            }
+            delete_task(task_id);
+            add(task_id,task_name,priority,time2complete);
+            cout<<"\ntask updated\n";
+            return;
+           
+        }
+       
+        void search_task(int task_id){
+            task *p = head;
+            if(!head){
+            	cout<<"list is empty"<<endl;
+            	return;
+            }
+            //if(p->task_id == task_id){
+                //cout<<"id found"<<endl;
+                //return;
+            //}
+            while(p && p->task_id != task_id ){
+                p = p->next;
+            }
+            if(!p){
+                cout<<"id not found"<<endl;
+                return;
+            }
+            cout<<"id found"<<endl;
+            cout<<"task name:"<<p->task_name<<endl;
+            cout<<"task priority:"<<p->priority<<endl;
+            cout<<"time 2 complete:"<<p->time2complete<<endl;
+            return;
+        }
+         
+        void middle_node(){
+            if(!head){
+                cout<<"list is empty"<<endl;
+                return;
+            }
+            task *slow = head, *fast = head;
+            while(fast && fast->next){
+                slow = slow->next;
+                fast = fast->next->next;
+            }
+            cout<<"middle node is:"<<slow->task_id<<"\t"<<slow->task_name<<"\t"<<slow->priority<<"\t"<<slow->time2complete<<endl;
+            return;
+        }
+		
+		void priority_count(){
+			int count[5]={0};
+			if(!head) return;
+			task *p = head;
+			while(p){
+				count[p->priority-1]++;
+				p=p->next;
+			}
+			for(int i=0;i<5;i++)
+			cout<<"Tasks with priority "<<i+1<<" are :"<<count[i]<<endl;
+			return;
+		}
+		
+        void total_tasks(){
+        	if(!head){
+        		cout<<"0 tasks"<<endl;
+        		return;
+        	}
+        	int count=0;
+			task *p = head;
+			while(p){
+				p = p->next;
+				count++;
+			}
+			cout<<"Total pending task are :"<<count<<endl;
+			return;	
+        }
+        
+        void single_priority(int x){
+        	if(!head){
+        		cout<<"list empty"<<endl;
+        		return;
+        	}
+        	task *p = head;
+        	int count = 0;
+        	while(p){
+        		if(x == p->priority)
+        			count++;
+        		p = p->next;
+        	}
+        	cout<<"The element with priority "<<x<<" is :"<<count<<endl;
+        	return;
+        }
+        
+        /*void complete_task(){
+        	if(!head){
+        		cout<<"task list is empty"<<endl;
+        		return;
+        	}
+        	task *p = head,*q=head;
+        	int min_priority = head->priority,min_time = head->time2complete;
+        	while(p && p->priority == head->priority){
+        		if(p->time2complete < min_time){
+        			min_time = p->time2complete;
+        			q = p;
+        		}
+        		p = p->next;
+        	}
+        	p = q;
+        	cout<<p->task_id<<"\t"<<p->task_name<<"\t"<<p->priority<<"\t"<<p->time2complete<<endl;
+        	delete_task(p->task_id);
+        	cout<<"task completed successfully"<<endl;
+        	return;
+        }
+        */
+        
+        void complete_task(){
+        	//list is empty
+        	if(!head){
+        		cout<<"list is empty"<<endl;
+        		return;
+        	}
+        	
+        	task *p,*pp,*temp,*temp_p;
+        	temp_p=pp=NULL;
+        	p=temp=head;
+        	//one element
+        	if(!head->next){
+        		cout<<"task completed 1"<<endl;
+        		delete p;
+        		head = NULL;
+        		tail = NULL;
+        		return;
+        	}
+        	//finding task with minimum complete time
+        	while(temp && temp->priority == head->priority){
+        		if(temp->time2complete < p->time2complete){
+        			pp = temp_p;
+        			p = temp;
+        		}
+        		temp_p = temp;
+        		temp = temp->next;
+        	}
+        	//at tail
+        	if(!p->next){
+        		cout<<"task completed 2"<<endl;
+        		delete p;
+        		pp->next = NULL;
+        		tail = pp;
+        		return;
+        	}
+        	//at head
+        	if(!pp){
+        		head = head->next;
+        		cout<<"task completed 3"<<endl;
+        		delete p;
+        		return;
+        	}
+        	 //other elements
+            pp->next = p->next;
+            delete p;
+            cout<<"task completed!!"<<endl;
+            return;
+        	
+        }
+        
+        
+        ~task_manager(){
+        	task *temp = head,*p = NULL;
+        	while(temp){
+        		p = temp;
+        		temp = temp->next;
+        		delete p;	
+        	}	
+        }
+};
+
+int disp_data(){
+	int n;
+	cout<<"=====TASK MANAGER============="<<endl;
+	cout<<"1.Add new task"<<endl;
+	cout<<"2.Delete a task"<<endl;
+	cout<<"3.Update a task"<<endl;
+	cout<<"4.Search a task"<<endl;
+	cout<<"5.Display"<<endl;
+	cout<<"6.complete a task"<<endl;
+	cout<<"7.Display total tasks"<<endl;
+	cout<<"8.Display  Priority count"<<endl;
+	cout<<"9.Exit"<<endl;
+	cout<<"Enter:";
+	cin>>n;
+	cout<<"=============================="<<endl;
+	return n;
+}
+
+void add_helper(task_manager *t1){
+	int task_id,time,priority;
+	string name;
+	cout<<"enter task id:";
+	cin>>task_id;
+	cout<<"enter task name:";
+	cin>>name;
+	cout<<"enter task priority:";
+	cin>>priority;
+	
+	cout<<"enter time to complete task:";
+	cin>>time;
+	if(priority>=1 && priority<=5) 
+	t1->add(task_id,name,priority,time);
+	else cout<<"enter a valid priority"<<endl;
+	//cout<<"task added!!"<<endl;
+	return;
+}
+
+void delete_task_helper(task_manager *t1){
+	int task_id;
+	cout<<"enter the task id:";
+	cin>>task_id;
+	t1->delete_task(task_id);
+	//cout<<"task deleted!!"<<endl;
+	return;
+}
+void update_helper(task_manager *t1){
+	int task_id,time,priority;
+	string name;
+	cout<<"enter task id to update:";
+	cin>>task_id;
+	cout<<"enter new task name:";
+	cin>>name;
+	cout<<"enter new task priority:";
+	cin>>priority;
+	cout<<"enter new time to complete task:";
+	cin>>time;
+	t1->update_task(task_id,name,priority,time);
+	//cout<<"task updated!!"<<endl;
+	return;
+}
+void search_helper(task_manager *t1){
+	int task_id;
+	cout<<"enter task id to be searched:";
+	cin>>task_id;
+	t1->search_task(task_id);
+	return;
+}
+
+int main(){
+	task_manager t1;
+	t1.add(1,"first",1,2);
+    t1.add(2,"second",2,3);
+    t1.add(3,"third",4,4);
+    t1.add(4,"five",3,1);
+   t1.add(5,"six",5,1);
+   t1.add(7,"seven",5,1);
+   t1.add(9,"ten",4,1);
+	int flag=1;	
+    do{
+    	int n = disp_data();
+    	switch(n){
+    		case 1: add_helper(&t1);
+    			break;
+    		case 2: delete_task_helper(&t1);
+    			break;
+    		case 3: update_helper(&t1);
+    			break;
+    		case 4: search_helper(&t1);
+    			break;
+    		case 5: t1.display();
+    			break;
+    		case 6: t1.complete_task();
+    			break;
+    		case 7: t1.total_tasks();
+    			break;
+    		case 8: t1.priority_count();
+    			break;
+    		case 9: flag=0;
+    			break;
+    		default: cout<<"enter appropriate value"<<endl;
+    	}
+    }while(flag);
+    return 0;
+}
+//test cases============================================
+    /*t1.add(1,"first",1,2);
+    t1.add(2,"second",2,3);
+    t1.add(3,"third",4,4);
+    t1.add(4,"five",3,1);
+   t1.add(5,"six",5,1);
+   t1.add(7,"seven",7,1);
+   t1.add(10,"ten",4,1);
+    t1.display();
+    
+    cout<<"==============================="<<endl;
+    t1.delete_task(7);
+    t1.display();
+    cout<<"==============================="<<endl;
+    t1.delete_task(1);
+    t1.display();
+    cout<<"==============================="<<endl;
+    t1.delete_task(3);
+    t1.display();
+    cout<<"==============================="<<endl;
+    t1.delete_task(2);
+    t1.display();
+    cout<<"==============================="<<endl;
+    t1.delete_task(10);
+    t1.display();
+    cout<<"==============================="<<endl;
+    t1.delete_task(4);
+    t1.display();
+    cout<<"==============================="<<endl;
+    t1.delete_task(5);
+    t1.display();
+    
+    t1.add(1,"first",5,1);
+    t1.add(2,"second",5,3);
+    t1.add(3,"third",5,4);
+    t1.add(4,"five",5,1);
+    t1.add(5,"six",5,1);
+    t1.add(7,"seven",5,1);
+    t1.add(10,"ten",5,1);
+    
+
+    t1.display();
+    /*t1.priority_count();
+    t1.total_tasks();
+	t1.single_priority(1);
+	t1.single_priority(2);
+	t1.single_priority(3);
+	t1.single_priority(4);
+	t1.single_priority(5);
+	
+	//t1.delete_task(1);
+	t1.complete_task();
+	t1.display();
+	cout<<"============================="<<endl;
+	t1.complete_task();
+	t1.display();
+	cout<<"============================="<<endl;
+	t1.complete_task();
+	t1.display();
+	cout<<"============================="<<endl;
+	t1.complete_task();
+	t1.display();
+	cout<<"============================="<<endl;
+	t1.complete_task();
+	t1.display();
+	cout<<"============================="<<endl;
+	t1.complete_task();
+	t1.display();
+	cout<<"============================="<<endl;
+	t1.complete_task();
+	t1.display();*/
