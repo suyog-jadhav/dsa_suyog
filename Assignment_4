@@ -1,0 +1,193 @@
+#include<iostream>
+#include<cstdlib>
+#include<cmath>
+using namespace std;
+
+struct element{
+	int coef;
+	int pow;
+	element *next,*prev;
+};
+
+class Polynomial{
+	element *head;
+	public:
+		Polynomial(){
+			head = NULL;
+		}
+		
+		void addElements(int x){
+			int coef,pow;
+			for(int i = 0;i < x; i++){
+				coef = rand()%10 + 1;
+				pow = rand()%10 + 1;
+				addhelper(coef,pow);		
+			}			
+		}
+		
+		void addhelper(int coef,int pow){
+			element *p = new element;
+			if(!p) return;
+			p->next = NULL;
+			p->prev = NULL;
+			p->coef = coef;
+			p->pow = pow;
+			//if no element
+			if(!head){
+				p->next = head;
+				p->prev = head;
+				head = p;
+				return; 
+			}
+			//if power greater from first
+			if(p->pow > head->pow){
+				p->next = head;
+				head->prev = p;
+				head = p;
+				return;
+			}
+			element *q = head;
+			//finding the right position
+			while(q->next && p->pow < q->pow){
+				q=q->next;
+			}
+			//if elements have same pow
+			if(p->pow == q->pow){
+				q->coef += p->coef;
+				delete p;
+				return;
+			}
+			//if element has lowest power
+			if(!q->next && p->pow < q->pow){
+				q->next = p;
+				p->prev = q;
+				return;
+			}
+			p->prev = q->prev;
+			q->prev->next = p;
+			p->next = q;
+			q->prev = p;
+			return;		
+		}
+		
+		void display(){
+    			if(!head) return;
+    			element *p = head;
+    			while(p){
+    				if(p == head && p->coef<0) cout << " - ";
+        			cout << abs(p->coef) << "x^" << p->pow;
+        			if(p->next && p->coef>0) cout << " + ";
+        			else if(p->next) cout << " - ";
+        			p = p->next;
+    			}
+    			cout << endl;
+		}
+
+		
+		Polynomial operator+(Polynomial P2){
+			Polynomial P3;
+			element *a,*b;
+			a = head;
+			b = P2.head;
+			while(a && b){
+				if(a->pow == b->pow){
+					P3.addhelper(a->coef+b->coef,a->pow);
+					a = a->next;
+					b = b->next;
+					continue;
+				}
+				if(a->pow > b->pow){
+					P3.addhelper(a->coef,a->pow);
+					a = a->next;
+					continue;
+				}
+				if(a->pow < b->pow){
+					P3.addhelper(b->coef,b->pow);
+					b = b->next;
+					continue;
+				}
+			}
+			while(a){
+				P3.addhelper(a->coef,a->pow);
+				a = a->next;
+			}
+			while(b){
+				P3.addhelper(b->coef,b->pow);
+				b = b->next;
+			}
+
+			return P3;
+		}
+		
+		Polynomial operator-(Polynomial P2){
+		    Polynomial P3;
+		    element *a, *b;
+		    a = head;
+		    b = P2.head;
+
+		    while(a && b){
+			if(a->pow == b->pow){
+			    int diff = a->coef - b->coef;
+			    if(diff != 0)  // only add non-zero terms
+				P3.addhelper(diff, a->pow);
+			    a = a->next;
+			    b = b->next;
+			    continue;
+			}
+			if(a->pow > b->pow){
+			    P3.addhelper(a->coef, a->pow);
+			    a = a->next;
+			    continue;
+			}
+			if(a->pow < b->pow){
+			    P3.addhelper(-b->coef, b->pow);  // negate terms from P2
+			    b = b->next;
+			    continue;
+			}
+		    }
+
+		    while(a){
+			P3.addhelper(a->coef, a->pow);
+			a = a->next;
+		    }
+		    while(b){
+			P3.addhelper(-b->coef, b->pow);  // negate remaining terms of P2
+			b = b->next;
+		    }
+
+		    return P3;
+		}
+				
+		double evaluate(double x){
+		    double result = 0;
+		    element *p = head;
+		    while(p){
+			result += p->coef * pow(x, p->pow);
+			p = p->next;
+		    }
+		    return result;
+		}
+		
+
+	
+};
+
+int main(){
+	Polynomial P1,P2,P3,P4;
+	cout<<"Polynomial P1:";
+	P1.addElements(10);
+	P1.display();
+	cout<<"Polynomial P2:";
+	P2.addElements(10);
+	P2.display();
+	P3 = P1 + P2;
+	cout<<"After addition P1+P2:";
+	P3.display();
+	P4 = P1 - P2;
+	cout<<"After subtraction P1-P2:";
+	P4.display();
+	cout<<"After evaluation P3:";
+	cout<<P3.evaluate(1)<<endl;
+	return 0;
+}
+
